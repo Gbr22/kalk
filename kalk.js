@@ -17,7 +17,7 @@ let tokensTypes = {
     },
     Number:class extends Token {
         static is(c){
-            return "123456789.".includes(c);
+            return "0123456789.".includes(c);
         }   
     },
     End:class extends Token {
@@ -112,6 +112,7 @@ function genTree(tokens){
         
             if (token.string == "/" || token.string == "*"){
                 connect(i);
+                break;
             }
         }    
     }
@@ -153,7 +154,7 @@ function execute(tree){
         "*":(a,b)=>a*b,
     }
     let ev = operations[tree.operation.string](parseFloat(left),parseFloat(right));
-    /* console.log(left,tree.operation.string,"=",right,ev); */
+    console.log(left,tree.operation.string,right,"=",ev);
     return {string:ev.toString()};
 }
 
@@ -166,7 +167,9 @@ function evalMath(){
 }
 
 
-let math = "11 + 1.5 / 2 - 2 * 0";
+/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
+let math = "7.56 * 28 / 3 * 6.5 * 56 / 456 - 446 + 654";
+/* let math = "5 * 10 + 8 / 5 - 16" */
 
 console.time("evalMath");
 let myresult = evalMath(math)
