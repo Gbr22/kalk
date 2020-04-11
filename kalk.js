@@ -169,10 +169,13 @@ function evalMath(){
 let math = "11 + 1.5 / 2 - 2 * 0";
 
 console.time("evalMath");
-console.log("evalMath",evalMath(math));
+let myresult = evalMath(math)
+console.log("evalMath",myresult);
 console.timeEnd("evalMath");
 console.time("eval");
-console.log("eval",eval(math));
+let result = eval(math);
+console.log("eval",result);
 console.timeEnd("eval");
+console.log("matching",myresult == result);
 
 setInterval(()=>{});
