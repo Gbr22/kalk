@@ -1,7 +1,5 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "sin(15+5)";
-/* let math = "5 * 10 + 8 / 5 - 16" */
-/* let math = "0 + sin(1)" */
+let math = "(0-27)ˇ3";
 
 let input = document.getElementById("input");
 let syntax = document.getElementById("syntax");

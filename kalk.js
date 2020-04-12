@@ -84,12 +84,17 @@ class Operation extends TreeObj {
         let left = valOrEx(tree.left);
         let right = valOrEx(tree.right);
 
-        
+        function nthRoot(x, n) {
+            if(x < 0 && n%2 != 1) return NaN;
+            return (x < 0 ? -1 : 1) * Math.pow(Math.abs(x), 1/n);
+        }
         let operations = {
             "+":(a,b)=>a+b,
             "/":(a,b)=>a/b,
             "-":(a,b)=>a-b,
             "*":(a,b)=>a*b,
+            "^":(a,b)=>Math.pow(a,b),
+            "ˇ":(a,b)=>nthRoot(a,b),
         }
         let ev = operations[tree.operation.string](parseFloat(left),parseFloat(right));
         console.log(left,tree.operation.string,right,"=",ev);
@@ -111,7 +116,7 @@ let tokensTypes = {
     },
     Symbol:class extends Token {
         static is(c){
-            return "+-*/()!".includes(c);
+            return "+-*/()!^ˇ".includes(c);
         }
     },
     Number:class extends Token {
@@ -290,27 +295,36 @@ function genTree(tokens,context){
             }
         }
     }
-
-    while(notAllConnected("/") || notAllConnected("*")){
-        for (let i=0; i< tokens.length; i++){
-            let token = tokens[i];
-        
-            if (token.string == "/" || token.string == "*"){
-                connect(i);
-                break;
+    function connectTwoSidedOperation(a,b, start="left"){
+        while(notAllConnected(a) || notAllConnected(b)){
+            function stuff(i){
+                let token = tokens[i];
+            
+                if (token.string == a || token.string == b){
+                    connect(i);
+                    return true;
+                }
+                return false;
             }
-        }    
-    }
-    while(notAllConnected("+") || notAllConnected("-")){
-        for (let i=0; i< tokens.length; i++){
-            let token = tokens[i];
-        
-            if (token.string == "+" || token.string == "-"){
-                connect(i);
-                break;
+            if (start == "left"){
+                for (let i=0; i< tokens.length; i++){
+                    if (stuff(i)){
+                        break;
+                    }
+                }    
+            } else {
+                for (let i=tokens.length-1; i>=0; i--){
+                    if (stuff(i)){
+                        break;
+                    }
+                }
             }
-        }    
+            
+        }
     }
+    connectTwoSidedOperation("/","*");
+    connectTwoSidedOperation("+","-");
+    connectTwoSidedOperation("^","ˇ", "right");
     return tokens[0];
 }
 function execute(tree){
