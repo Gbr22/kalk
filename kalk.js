@@ -104,6 +104,11 @@ class Operation extends TreeObj {
 }
 
 let tokensTypes = {
+    WhiteSpace:class extends Token {
+        static is(c){
+            return c == " " || c == "\n";
+        }
+    },
     Symbol:class extends Token {
         static is(c){
             return "+-*/()!".includes(c);
@@ -143,15 +148,15 @@ let tokensTypes = {
 }
 
 
-function tokenize(str, context){
+function tokenize(str, context, keepWhitespace = false){
     let tokens = [];
     let currentToken = null;
     for (let i=0; i < str.length; i++){
         let char = str[i];
 
-        let isWhitespace = (c)=>c == " " || c == "\n";
+        let isWhitespace = tokensTypes.WhiteSpace.is;
 
-        if (isWhitespace(char)){
+        if (isWhitespace(char) && !keepWhitespace){
             continue;
         }
 

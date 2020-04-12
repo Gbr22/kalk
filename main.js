@@ -1,5 +1,5 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "((5*5)-20)!*2";
+let math = "((5*5) - 20)! * 2";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 /* let math = "0 + sin(1)" */
 
@@ -16,15 +16,13 @@ input.value = math;
 function onInputChange(){
     let math = input.value;
 
-    let tokens = tokenize(math);
+    let tokens = tokenize(math,{},true);
     
-    /* console.log(tokens); */
+    console.log("whitespace",tokens);
     tokens = tokens.map((token)=>{
         return token.string.split("").map((char, index)=>{
             let t = new token.constructor();
-            console.log(token.foundAt,index,char);
             t.string = char;
-            t.foundAt = token.foundAt+index;
             return t;
         })
     }).flat();
