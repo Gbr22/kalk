@@ -12,7 +12,6 @@ class Token extends TreeObj {
 }
 class Value extends TreeObj {
     isValue(){
-        console.log("[value class] isValue called");
         return true;
     };
 }
@@ -38,7 +37,6 @@ class Operation extends TreeObj {
     operation;
     getValue(){
         function valOrEx(side){
-            console.log(side,side.isValue());
             if (!side){
                 return;
             } else {
@@ -94,6 +92,7 @@ let tokensTypes = {
         static is(){return false}
     },
     Identifier:class extends Token {
+        context;
         string="";
         static is(c){
             let isOtherType = false;
@@ -106,11 +105,14 @@ let tokensTypes = {
             }
             return !isOtherType;
         }
+        getValue(){
+            return new NumberValue(this.context[this.string]);
+        }
     }
 }
 
 
-function tokenize(str){
+function tokenize(str, context){
     let tokens = [];
     let currentToken = null;
     for (let i=0; i < str.length; i++){
@@ -156,6 +158,13 @@ function tokenize(str){
             return token;
         }
     }).flat();
+
+    for (let token of tokens){
+        if (token.isType(tokensTypes.Identifier)){
+            token.context = context;
+        }
+    }
+
     /* tokens.push(new tokensTypes.End); */
     return tokens;
 }
@@ -244,8 +253,8 @@ function execute(tree){
     return tree.getValue();
 }
 
-function evalMath(math){
-    let tokens = tokenize(math);
+function evalMath(math,context){
+    let tokens = tokenize(math,context);
     console.log(tokens);
     let tree = genTree([...tokens]);
     require("fs").writeFileSync("out.json",JSON.stringify(tree));
@@ -255,15 +264,29 @@ function evalMath(math){
 
 
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "7.56 * 28 / (3 * 6.5) * 56 / ((456 - 446) + 654)";
+let math = "π * π";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 
+function evalInScope(js, contextAsScope) {
+    //# Return the results of the in-line anonymous function we .call with the passed context
+    return function() { with(this) { return eval(js); }; }.call(contextAsScope);
+}
+
+let defaultContext = {
+    "PI":Math.PI,
+    "π":Math.PI
+}
+
+let context = Object.assign(Object.assign({},defaultContext),{
+    a:5
+});
+
 console.time("evalMath");
-let myresult = evalMath(math)
+let myresult = evalMath(math,context);
 console.log("evalMath",myresult);
 console.timeEnd("evalMath");
 console.time("eval");
-let result = eval(math);
+let result = evalInScope(math,context);
 console.log("eval",result);
 console.timeEnd("eval");
 console.log("matching",myresult == result);
