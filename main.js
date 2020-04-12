@@ -1,5 +1,9 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "5+5\n5*5";
+let math = 
+`a=random()
+x=a
+y=a
+b=x-y`;
 
 let input = document.getElementById("input");
 let syntax = document.getElementById("syntax");
