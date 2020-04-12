@@ -313,7 +313,6 @@ function evalMath(math,context){
     let tokens = tokenize(math,context);
     console.log("tokens",tokens);
     let tree = genTree([...tokens],context);
-    require("fs").writeFile("out.json",JSON.stringify(tree),()=>{});
     console.log("tree",tree);
     return parseFloat(execute(tree).getValue());
 }
@@ -387,8 +386,3 @@ function test(math,context){
 
     console.log("matching",isEqual(myresult,result));
 }
-/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "((5*5) - 20)! * 2";
-/* let math = "5 * 10 + 8 / 5 - 16" */
-/* let math = "0 + sin(1)" */
-test(math,context);
