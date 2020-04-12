@@ -1,5 +1,5 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "((5*5) - 20)! * 2";
+let math = "sin(15)";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 /* let math = "0 + sin(1)" */
 
@@ -9,16 +9,15 @@ let syntax = document.getElementById("syntax");
 input.oninput = function(){
     onInputChange();
 }
+input.onkeydown = function(){
+    onInputChange();
+}
 
 let output = document.getElementById("output");
 input.value = math;
 
-function onInputChange(){
-    let math = input.value;
-
+function highLight(math){
     let tokens = tokenize(math,{},true);
-    
-    console.log("whitespace",tokens);
     tokens = tokens.map((token)=>{
         return token.string.split("").map((char, index)=>{
             let t = new token.constructor();
@@ -29,13 +28,36 @@ function onInputChange(){
 
     let isBrackets = (t)=>t.string == "(" || t.string == ")";
 
-    syntax.innerHTML = tokens.map((token)=>{
-        return `<span class="${token.constructor.name} ${isBrackets(token) ? 'brackets' : ''}">${token.string}</span>`
+    let content = tokens.map((token)=>{
+        let content = token.string;
+        if (content == "\n"){
+            content = "<br>";
+        } else if (content == " "){
+            content = "&nbsp;";
+        }
+        return `<span class="${token.constructor.name}${isBrackets(token) ? ' brackets' : ''}${token.string==' ' ? 'space' : ''}">${content}</span>`
     }).join("");
-    console.log("running",math);
+    return content;
+}
+
+function onInputChange(){
+    let math = input.value;
+    
+    let content;
     try {
-        output.innerHTML = evalMath(math,{});
+        content = highLight(math);
     } catch(err){
+        content = math;
+    }
+    syntax.innerHTML = content;
+
+    try {
+        let result = evalMath(math,Object.assign({},defaultContext));
+        console.log("res",result);
+        output.innerHTML = result;
+
+    } catch(err){
+        console.log(err);
         output.innerHTML = "Error";
     }
 

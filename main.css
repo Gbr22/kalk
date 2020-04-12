@@ -55,12 +55,19 @@ body, html {
     border-left: none;
     border-right: none;
 }
-
+#input::selection {
+  color: transparent;
+  background: rgba(255, 255, 255, 0.1);
+}
 #syntax .Symbol {
     color: #56B6C2;
 }
 #syntax .Symbol.brackets {
     color: rgb(160, 160, 160);
+}
+#syntax .Whitespace {
+    color: transparent;
+    border-right: 1px solid black;
 }
 #syntax .Identifier {
     color: #E05749;
