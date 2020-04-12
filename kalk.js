@@ -38,7 +38,13 @@ class Func extends TreeObj {
     getValue(){ //execute
         let out=this.context[this.name.string](
             [...this.arguments.map(
-                (arg)=>execute(arg)
+                (arg)=>{
+                    if (arg == undefined){
+                        return undefined;
+                    } else {
+                        return execute(arg);
+                    }
+                }
             )]
         );
         return new NumberValue(out);
@@ -280,14 +286,14 @@ function evalMath(math,context){
     let tokens = tokenize(math,context);
     console.log("tokens",tokens);
     let tree = genTree([...tokens],context);
-    require("fs").writeFileSync("out.json",JSON.stringify(tree));
+    require("fs").writeFile("out.json",JSON.stringify(tree),()=>{});
     console.log("tree",tree);
     return parseFloat(execute(tree).getValue());
 }
 
 
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "sin(1)";
+let math = "random()";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 /* let math = "0 + sin(1)" */
 
@@ -300,21 +306,50 @@ function evalInScope(js, contextAsScope) {
 let defaultContext = {
     "PI":Math.PI,
     "π":Math.PI,
-    sin:Math.sin
+    "Tau":Math.PI/2,
+    "τ":Math.PI/2,
+}
+for (let p of Object.getOwnPropertyNames(Math)){
+    if (!defaultContext[p]){
+        defaultContext[p] = Math[p];
+    }
 }
 
 let context = Object.assign(Object.assign({},defaultContext),{
     a:5
 });
 
-console.time("evalMath");
-let myresult = evalMath(math,context);
-console.log("evalMath",myresult);
-console.timeEnd("evalMath");
-console.time("eval");
-let result = evalInScope(math,context);
-console.log("eval",result);
-console.timeEnd("eval");
-console.log("matching",myresult == result);
+function test(math,context){
+    function benchmark(func){
+        console.time();
+        let result = func();
+        console.timeEnd();
+        return result;
+    }
+    
+    let myresult = benchmark(()=>evalMath(math,context));
+    let result = benchmark(()=>evalInScope(math,context));
+
+    
+    
+    if (typeof result == "string"){
+        result = NaN;
+    }
+    
+    console.log("evalMath",myresult);
+    console.log("eval",result);
+
+    function isEqual(a,b){
+        if (isNaN(a) && isNaN(b)){
+            return true;
+        } else {
+            return myresult == result;
+        }
+    }
+
+    console.log("matching",isEqual(myresult,result));
+}
+test(math,context);
+
 
 setInterval(()=>{});
