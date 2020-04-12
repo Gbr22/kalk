@@ -36,17 +36,16 @@ class Func extends TreeObj {
     context;
     name;
     getValue(){ //execute
-        let out=this.context[this.name.string](
-            [...this.arguments.map(
-                (arg)=>{
-                    if (arg == undefined){
-                        return undefined;
-                    } else {
-                        return execute(arg);
-                    }
+        let args = this.arguments.map(
+            (arg)=>{
+                if (arg == undefined){
+                    return undefined;
+                } else {
+                    return execute(arg);
                 }
-            )]
+            }
         );
+        let out=this.context[this.name.string](...args);
         return new NumberValue(out);
     }
 }
@@ -293,7 +292,7 @@ function evalMath(math,context){
 
 
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "random()";
+let math = "factorial(5)";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 /* let math = "0 + sin(1)" */
 
@@ -302,12 +301,21 @@ function evalInScope(js, contextAsScope) {
     return function() { with(this) { return eval(js); }; }.call(contextAsScope);
 }
 
+function factorial(n){
+    let result = n;
+    for (let i=1; i < n; i++){
+        result*=i;
+    }
+    return result;
+}
+
 
 let defaultContext = {
     "PI":Math.PI,
     "π":Math.PI,
     "Tau":Math.PI/2,
     "τ":Math.PI/2,
+    factorial,
 }
 for (let p of Object.getOwnPropertyNames(Math)){
     if (!defaultContext[p]){
@@ -350,6 +358,3 @@ function test(math,context){
     console.log("matching",isEqual(myresult,result));
 }
 test(math,context);
-
-
-setInterval(()=>{});
