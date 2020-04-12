@@ -1,9 +1,9 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
 let math = 
-`a=random()
-x=a
-y=a
-b=x-y`;
+`f()=random()
+f()-f()`;
+/* let math = `a=5
+a`; */
 
 let input = document.getElementById("input");
 let syntax = document.getElementById("syntax");
@@ -63,7 +63,6 @@ function highLight(math){
             }
             return false;
         }
-        console.log("function",token,token.isType(tokensTypes.Identifier),isNext("("));
         return `<span class="
             ${token.constructor.name}
             ${isBrackets(token) ? ' brackets' : ''}

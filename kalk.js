@@ -52,6 +52,7 @@ class Func extends TreeObj {
     arguments;
     context;
     name;
+    isValue(){return false}
     execute(){ //execute
         let args = this.arguments.map(
             (arg)=>{
@@ -72,8 +73,7 @@ class Operation extends TreeObj {
     operation;
     execute(){
         let tree = this;
-        let left = tree.left.execute().getValue();
-        let right = tree.right.execute().getValue();
+        
 
         function nthRoot(x, n) {
             if(x < 0 && n%2 != 1) return NaN;
@@ -91,14 +91,29 @@ class Operation extends TreeObj {
         let op = tree.operation.string;
 
         if (op == "="){
-            let val = tree.right.execute().getValue();
-            tree.left.execute().setValue(val);
-            return new NumberValue(val);
+            console.log("set",tree.left,tree.left.isValue());
+            if (tree.left.isValue()){
+                let val = tree.right.execute().getValue();
+                tree.left.execute().setValue(val);
+                return new NumberValue(val);
+            } else if(tree.left.constructor == Func){
+                
+                tree.left.context[tree.left.name.string] = function(){
+                    return tree.right.execute().getValue();
+                };
+                return new NumberValue(undefined);
+            } else {
+                throw Error("Cannot set value: Left is not a value container or a function head");
+            }
+        } else {
+            let left = tree.left.execute().getValue();
+            let right = tree.right.execute().getValue();
+            let ev = operations[tree.operation.string](left,right);
+            console.log(left,op,right,"=",ev);
+            return new NumberValue(ev);
         }
 
-        let ev = operations[tree.operation.string](left,right);
-        console.log(left,op,right,"=",ev);
-        return new NumberValue(ev);
+        
     }
     constructor(operation,left,right){
         super();
@@ -138,6 +153,7 @@ let tokensTypes = {
     Identifier:class extends Token {
         context;
         string="";
+        isValue(){return true};
         static is(c){
             let isOtherType = false;
             for (let type of Object.values(tokensTypes)){
