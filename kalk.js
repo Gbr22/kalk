@@ -242,6 +242,7 @@ function genTree(tokens){
         
             if (token.string == "+" || token.string == "-"){
                 connect(i);
+                break;
             }
         }    
     }
@@ -261,8 +262,8 @@ function evalMath(math,context){
 }
 
 
-/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "π * π";
+let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654";
+/* let math = "π * π"; */
 /* let math = "5 * 10 + 8 / 5 - 16" */
 
 function evalInScope(js, contextAsScope) {
