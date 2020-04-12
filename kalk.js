@@ -26,6 +26,43 @@ class Brackets extends TreeObj {
         return execute(this.contents).getValue();
     }
 }
+class Operation extends TreeObj {
+    left;
+    right;
+    operation;
+    getValue(){
+        function valOrEx(side){
+            if (!side){
+                return;
+            }
+            else if (side.operation){
+                return execute(side).getValue();
+            } else {
+                return side.getValue();
+            }
+        }
+        let tree = this;
+        let left = valOrEx(tree.left);
+        let right = valOrEx(tree.right);
+
+        
+        let operations = {
+            "+":(a,b)=>a+b,
+            "/":(a,b)=>a/b,
+            "-":(a,b)=>a-b,
+            "*":(a,b)=>a*b,
+        }
+        let ev = operations[tree.operation.string](parseFloat(left),parseFloat(right));
+        console.log(left,tree.operation.string,right,"=",ev);
+        return new NumberValue(ev);
+    }
+    constructor(operation,left,right){
+        super();
+        this.operation = operation;
+        this.left = left;
+        this.right = right;
+    }
+}
 
 let tokensTypes = {
     Symbol:class extends Token {
@@ -120,11 +157,7 @@ let assure = (condition,message)=>{if (!condition){throw new Error(message)}}
 
 function genTree(tokens){
     function connect(i){
-        tokens[i] = {
-            operation:tokens[i],
-            left:tokens[i-1],
-            right:tokens[i+1]
-        }
+        tokens[i] = new Operation(tokens[i],tokens[i-1],tokens[i+1]);
         tokens[i-1] = undefined;
         tokens[i+1] = undefined;
         tokens = tokens.filter((e)=>e);
@@ -196,35 +229,8 @@ function genTree(tokens){
     }
     return tokens[0];
 }
-
-
-
 function execute(tree){
-    function valOrEx(side){
-        if (!side){
-            return;
-        }
-        else if (side.operation){
-            return execute(side).getValue();
-        } else {
-            return side.getValue();
-        }
-    }
-
-
-    let left = valOrEx(tree.left);
-    let right = valOrEx(tree.right);
-
-    
-    let operations = {
-        "+":(a,b)=>a+b,
-        "/":(a,b)=>a/b,
-        "-":(a,b)=>a-b,
-        "*":(a,b)=>a*b,
-    }
-    let ev = operations[tree.operation.string](parseFloat(left),parseFloat(right));
-    console.log(left,tree.operation.string,right,"=",ev);
-    return new NumberValue(ev);
+    return tree.getValue();
 }
 
 function evalMath(){
