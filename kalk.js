@@ -76,6 +76,17 @@ function tokenize(str){
         }
     }
     tokens.push(currentToken);
+    tokens = tokens.map((token)=>{
+        if (token.isType(tokensTypes.Symbol)){
+            return token.string.split("").map((char)=>{
+                let symbol = new tokensTypes.Symbol();
+                symbol.string = char;
+                return symbol;
+            })
+        } else {
+            return token;
+        }
+    }).flat();
     /* tokens.push(new tokensTypes.End); */
     return tokens;
 }
@@ -168,7 +179,7 @@ function evalMath(){
 
 
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "7.56 * 28 / 3 * 6.5 * 56 / 456 - 446 + 654";
+let math = "7.56 * 28 / 3 * 6.5 * 56 / ((456 - 446) + 654)";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 
 console.time("evalMath");
