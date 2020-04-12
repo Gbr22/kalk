@@ -86,6 +86,7 @@ class Operation extends TreeObj {
             "*":(a,b)=>a*b,
             "^":(a,b)=>Math.pow(a,b),
             "ˇ":(a,b)=>nthRoot(a,b),
+            "\n":(a,b)=>b
         }
         let ev = operations[tree.operation.string](left,right);
         console.log(left,tree.operation.string,right,"=",ev);
@@ -102,12 +103,12 @@ class Operation extends TreeObj {
 let tokensTypes = {
     WhiteSpace:class extends Token {
         static is(c){
-            return c == " " || c == "\n";
+            return c == " " || c == "\t";
         }
     },
     Symbol:class extends Token {
         static is(c){
-            return "+-*/()!^ˇ".includes(c);
+            return "+-*/()!^ˇ\n".includes(c);
         }
     },
     Number:class extends Token {
@@ -317,9 +318,13 @@ function genTree(tokens,context){
             
         }
     }
+    
+
     connectTwoSidedOperation("/","*");
     connectTwoSidedOperation("+","-");
     connectTwoSidedOperation("^","ˇ", "right");
+
+    connectTwoSidedOperation("\n","\n");
     return tokens[0];
 }
 function execute(tree){
