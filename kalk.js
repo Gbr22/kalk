@@ -1,10 +1,23 @@
 
+class TreeObj {
+    getValue(){}
+}
 
-
-class Token {
+class Token extends TreeObj {
     string="";
     isType(type){
         return this.constructor == type;
+    }
+}
+
+class NumberValue extends TreeObj {
+    value;
+    constructor(value){
+        super();
+        this.value = value;
+    }
+    getValue(){
+        return this.value;
     }
 }
 
@@ -18,7 +31,10 @@ let tokensTypes = {
     Number:class extends Token {
         static is(c){
             return "0123456789.".includes(c);
-        }   
+        }
+        getValue(){
+            return parseFloat(this.string);
+        }
     },
     End:class extends Token {
         string="End";
@@ -185,12 +201,12 @@ function execute(tree){
         if (!side){
             return;
         } else if(side.contents){
-            return execute(side.contents).string;
+            return execute(side.contents).getValue();
         }
         else if (side.operation){
-            return execute(side).string;
+            return execute(side).getValue();
         } else {
-            return side.string;
+            return side.getValue();
         }
     }
 
@@ -207,7 +223,7 @@ function execute(tree){
     }
     let ev = operations[tree.operation.string](parseFloat(left),parseFloat(right));
     console.log(left,tree.operation.string,right,"=",ev);
-    return {string:ev.toString()};
+    return new NumberValue(ev);
 }
 
 function evalMath(){
@@ -216,7 +232,7 @@ function evalMath(){
     let tree = genTree([...tokens]);
     require("fs").writeFileSync("out.json",JSON.stringify(tree));
     console.log(tree);
-    return parseFloat(execute(tree).string);
+    return parseFloat(execute(tree).getValue());
 }
 
 
