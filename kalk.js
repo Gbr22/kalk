@@ -117,6 +117,45 @@ function genTree(tokens){
         }
         return false;
     }
+    function bracketsCount(index){
+        let count = 0;
+        for (let i=0; i < index; i++){
+            let token = tokens[i];
+            if (token.string == "("){
+                count++;
+            } else if (token.string == ")"){
+                count--;
+            }
+        }
+        return count;
+    }
+    while(notAllConnected("(")){
+        let innerMostIndex = 0;
+        for (let i=0; i < tokens.length; i++){
+            if (bracketsCount(i) > bracketsCount(innerMostIndex)){
+                innerMostIndex = i;
+            }
+        }
+        let start = innerMostIndex - 1;
+        let end = start;
+        for (let i=start; i < tokens.length+1; i++){
+            if (bracketsCount(i) == bracketsCount(innerMostIndex)-1 && tokens[i-1].string == ")"){
+                end = i;
+                break;
+            }
+        }
+
+        console.log("brackets",innerMostIndex,tokens[innerMostIndex],start,end);
+        let obj = {
+
+        };
+        let area = tokens.splice(start,end-start,obj);
+        area.shift();
+        area.pop();
+        console.log(area);
+        obj.contents = genTree(area);
+    }
+
     while(notAllConnected("/") || notAllConnected("*")){
         for (let i=0; i< tokens.length; i++){
             let token = tokens[i];
@@ -173,6 +212,7 @@ function evalMath(){
     let tokens = tokenize(math);
     console.log(tokens);
     let tree = genTree([...tokens]);
+    require("fs").writeFileSync("out.json",JSON.stringify(tree));
     console.log(tree);
     return parseFloat(execute(tree).string);
 }
