@@ -67,7 +67,7 @@ class Func extends TreeObj {
                 if (arg == undefined){
                     return undefined;
                 } else {
-                    return execute(arg);
+                    return valOrEx(arg);
                 }
             }
         );
