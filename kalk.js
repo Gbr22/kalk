@@ -244,12 +244,14 @@ function genTree(tokens,context){
         let start = innerMostIndex - 1;
         let end = start;
         for (let i=start; i < tokens.length+1; i++){
-            if (bracketsCount(i) == bracketsCount(innerMostIndex)-1 && tokens[i-1].string == ")"){
-                end = i;
-                break;
+            if (bracketsCount(i) == bracketsCount(innerMostIndex)-1){
+                if (tokens[i-1] && tokens[i-1].string == ")"){
+                    end = i;
+                    break;
+                }
             }
         }
-        if (tokens[start-1].isType(tokensTypes.Identifier)){
+        if (tokens[start-1] && tokens[start-1].isType(tokensTypes.Identifier)){
             let obj = new Func();
             let area = tokens.splice(start,end-start,obj);
             area.shift();
@@ -386,7 +388,7 @@ function test(math,context){
     console.log("matching",isEqual(myresult,result));
 }
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "0+(2 + 3)!";
+let math = "((5*5) - 20)! * 2";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 /* let math = "0 + sin(1)" */
 test(math,context);
