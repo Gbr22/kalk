@@ -184,6 +184,8 @@ function execute(tree){
     function valOrEx(side){
         if (!side){
             return;
+        } else if(side.contents){
+            return execute(side.contents).string;
         }
         else if (side.operation){
             return execute(side).string;
@@ -219,7 +221,7 @@ function evalMath(){
 
 
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "7.56 * 28 / 3 * 6.5 * 56 / ((456 - 446) + 654)";
+let math = "7.56 * 28 / (3 * 6.5) * 56 / ((456 - 446) + 654)";
 /* let math = "5 * 10 + 8 / 5 - 16" */
 
 console.time("evalMath");
