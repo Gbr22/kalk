@@ -219,12 +219,10 @@ function genTree(tokens){
             }
         }
 
-        console.log("brackets",innerMostIndex,tokens[innerMostIndex],start,end);
         let obj = new Brackets();
         let area = tokens.splice(start,end-start,obj);
         area.shift();
         area.pop();
-        console.log(area);
         obj.contents = genTree(area);
     }
 
@@ -255,10 +253,10 @@ function execute(tree){
 
 function evalMath(math,context){
     let tokens = tokenize(math,context);
-    console.log(tokens);
+    console.log("tokens",tokens);
     let tree = genTree([...tokens]);
     require("fs").writeFileSync("out.json",JSON.stringify(tree));
-    console.log(tree);
+    console.log("tree",tree);
     return parseFloat(execute(tree).getValue());
 }
 
