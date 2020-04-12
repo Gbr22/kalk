@@ -10,19 +10,38 @@ body, html {
     flex-direction: column;
 }
 #input {
-    width: 100%;
-    resize: vertical;
-    margin: 0;
-    height: 150px;
-    padding: 0;
-    box-sizing: border-box;
-    padding: 20px;
+    color: transparent;
+    background-color: transparent;
+    caret-color: white;
+}
+#syntax {
+    color: white;
+    background-color: #2C3031;
+}
+#input, #syntax {
     outline: none;
     border: none;
-    background-color: #2C3031;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    margin: 0;
+    
+    padding: 0;
+    box-sizing: border-box;
     font-size: 30px;
-    color: white;
     font-family: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px;
+}
+
+#input_wrap {
+    box-sizing: border-box;
+    resize: none;
+    width: 100%;
+    height: 150px;
+    position: relative;
 }
 #output {
     padding: 20px;
@@ -35,4 +54,14 @@ body, html {
     border: 2px solid rgba(255, 255, 255, 0.39);
     border-left: none;
     border-right: none;
+}
+
+#syntax .Symbol {
+    color: #56B6C2;
+}
+#syntax .Symbol.brackets {
+    color: rgb(160, 160, 160);
+}
+#syntax .Number {
+    color: #D19A66;
 }
