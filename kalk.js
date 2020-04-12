@@ -20,7 +20,12 @@ class NumberValue extends TreeObj {
         return this.value;
     }
 }
-
+class Brackets extends TreeObj {
+    contents;
+    getValue(){
+        return execute(this.contents).getValue();
+    }
+}
 
 let tokensTypes = {
     Symbol:class extends Token {
@@ -162,9 +167,7 @@ function genTree(tokens){
         }
 
         console.log("brackets",innerMostIndex,tokens[innerMostIndex],start,end);
-        let obj = {
-
-        };
+        let obj = new Brackets();
         let area = tokens.splice(start,end-start,obj);
         area.shift();
         area.pop();
@@ -200,8 +203,6 @@ function execute(tree){
     function valOrEx(side){
         if (!side){
             return;
-        } else if(side.contents){
-            return execute(side.contents).getValue();
         }
         else if (side.operation){
             return execute(side).getValue();
