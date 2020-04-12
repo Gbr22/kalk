@@ -91,14 +91,34 @@ class Operation extends TreeObj {
         let op = tree.operation.string;
 
         if (op == "="){
-            console.log("set",tree.left,tree.left.isValue());
+            
             if (tree.left.isValue()){
                 let val = tree.right.execute().getValue();
                 tree.left.execute().setValue(val);
                 return new NumberValue(val);
             } else if(tree.left.constructor == Func){
                 
+                let nameToIndex = {};
+                let args = tree.left.arguments.filter((e)=>e); //TODO: properly handle not haveing undefined arg at index 0 when no args are present
+                console.log("args",args);
+                for (let i=0; i < args.length; i++){
+                    let arg = args[i];
+                    if (arg.constructor != tokensTypes.Identifier){
+                        throw new Error("Only identifiers are allowed in the arguments list");
+                    }
+                    nameToIndex[arg.string]=i;
+                }
+                console.log("name to index",nameToIndex);
+
                 tree.left.context[tree.left.name.string] = function(){
+                    let context = {}
+                    for (let p in nameToIndex){
+                        context[p] = arguments[nameToIndex[p]];
+                    }
+                    console.log("context",context);
+                    Object.assign(tree.left.context,context); //TODO: don't pollute the global context
+
+
                     return tree.right.execute().getValue();
                 };
                 return new NumberValue(undefined);
