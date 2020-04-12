@@ -1,8 +1,14 @@
 body, html {
     margin: 0;
     padding: 0;
+    background-color: #1E2223;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
 }
-
+.container {
+    display: flex;
+    flex-direction: column;
+}
 #input {
     width: 100%;
     resize: vertical;
@@ -11,4 +17,22 @@ body, html {
     padding: 0;
     box-sizing: border-box;
     padding: 20px;
+    outline: none;
+    border: none;
+    background-color: #2C3031;
+    font-size: 30px;
+    color: white;
+    font-family: inherit;
+}
+#output {
+    padding: 20px;
+    background-color: #212627;
+    display: block;
+    width: 100%;
+    font-size: 25px;
+    margin: 0;
+    box-sizing: border-box;
+    border: 2px solid rgba(255, 255, 255, 0.39);
+    border-left: none;
+    border-right: none;
 }
