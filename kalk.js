@@ -1,6 +1,7 @@
 
 class TreeObj {
     getValue(){}
+    isValue(){return false}
 }
 
 class Token extends TreeObj {
@@ -9,8 +10,13 @@ class Token extends TreeObj {
         return this.constructor == type;
     }
 }
-
-class NumberValue extends TreeObj {
+class Value extends TreeObj {
+    isValue(){
+        console.log("[value class] isValue called");
+        return true;
+    };
+}
+class NumberValue extends Value {
     value;
     constructor(value){
         super();
@@ -23,7 +29,7 @@ class NumberValue extends TreeObj {
 class Brackets extends TreeObj {
     contents;
     getValue(){
-        return execute(this.contents).getValue();
+        return execute(this.contents);
     }
 }
 class Operation extends TreeObj {
@@ -32,13 +38,17 @@ class Operation extends TreeObj {
     operation;
     getValue(){
         function valOrEx(side){
+            console.log(side,side.isValue());
             if (!side){
                 return;
-            }
-            else if (side.operation){
-                return execute(side).getValue();
             } else {
-                return side.getValue();
+                let valueContainer;
+                if (!side.isValue()){
+                    valueContainer = execute(side);
+                } else {
+                    valueContainer = side;
+                }
+                return valueContainer.getValue();
             }
         }
         let tree = this;
@@ -71,6 +81,7 @@ let tokensTypes = {
         }
     },
     Number:class extends Token {
+        isValue(){return true};
         static is(c){
             return "0123456789.".includes(c);
         }
