@@ -242,7 +242,7 @@ function genTree(tokens,context){
             }
         }
         let start = innerMostIndex - 1;
-        let end = start;
+        let end = null;
         for (let i=start; i < tokens.length+1; i++){
             if (bracketsCount(i) == bracketsCount(innerMostIndex)-1){
                 if (tokens[i-1] && tokens[i-1].string == ")"){
@@ -250,6 +250,9 @@ function genTree(tokens,context){
                     break;
                 }
             }
+        }
+        if (end == null){
+            throw new Error("( does not have a pair");
         }
         if (tokens[start-1] && tokens[start-1].isType(tokensTypes.Identifier)){
             let obj = new Func();
