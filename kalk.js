@@ -31,6 +31,19 @@ class Brackets extends TreeObj {
         return execute(this.contents);
     }
 }
+class Func extends TreeObj {
+    arguments;
+    context;
+    name;
+    getValue(){ //execute
+        let out=this.context[this.name.string](
+            [...this.arguments.map(
+                (arg)=>execute(arg)
+            )]
+        );
+        return new NumberValue(out);
+    }
+}
 class Operation extends TreeObj {
     left;
     right;
@@ -175,7 +188,7 @@ function isType(something, type){
 
 let assure = (condition,message)=>{if (!condition){throw new Error(message)}}
 
-function genTree(tokens){
+function genTree(tokens,context){
     function connect(i){
         tokens[i] = new Operation(tokens[i],tokens[i-1],tokens[i+1]);
         tokens[i-1] = undefined;
@@ -218,12 +231,23 @@ function genTree(tokens){
                 break;
             }
         }
-
-        let obj = new Brackets();
-        let area = tokens.splice(start,end-start,obj);
-        area.shift();
-        area.pop();
-        obj.contents = genTree(area);
+        if (tokens[start-1].isType(tokensTypes.Identifier)){
+            let obj = new Func();
+            let area = tokens.splice(start,end-start,obj);
+            area.shift();
+            area.pop();
+            obj.arguments = [genTree(area)];
+            obj.name = tokens[start-1];
+            obj.context = context;
+            tokens.splice(start-1,1);
+        } else {
+            let obj = new Brackets();
+            let area = tokens.splice(start,end-start,obj);
+            area.shift();
+            area.pop();
+            obj.contents = genTree(area);
+        }
+        
     }
 
     while(notAllConnected("/") || notAllConnected("*")){
@@ -255,25 +279,28 @@ function execute(tree){
 function evalMath(math,context){
     let tokens = tokenize(math,context);
     console.log("tokens",tokens);
-    let tree = genTree([...tokens]);
+    let tree = genTree([...tokens],context);
     require("fs").writeFileSync("out.json",JSON.stringify(tree));
     console.log("tree",tree);
     return parseFloat(execute(tree).getValue());
 }
 
 
-let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654";
-/* let math = "π * π"; */
+/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
+let math = "sin(1)";
 /* let math = "5 * 10 + 8 / 5 - 16" */
+/* let math = "0 + sin(1)" */
 
 function evalInScope(js, contextAsScope) {
     //# Return the results of the in-line anonymous function we .call with the passed context
     return function() { with(this) { return eval(js); }; }.call(contextAsScope);
 }
 
+
 let defaultContext = {
     "PI":Math.PI,
-    "π":Math.PI
+    "π":Math.PI,
+    sin:Math.sin
 }
 
 let context = Object.assign(Object.assign({},defaultContext),{
