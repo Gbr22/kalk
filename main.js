@@ -18,6 +18,12 @@ input.onkeydown = function(){
 let output = document.getElementById("output");
 input.value = math;
 
+input.onscroll = function(){
+    syntax.style.transform = `translate(${-input.scrollLeft}px, ${-input.scrollTop}px)`
+
+}
+
+
 function highLight(math){
     let tokens = tokenize(math,{},true);
     tokens = tokens.map((token)=>{
@@ -33,13 +39,13 @@ function highLight(math){
     let content = tokens.map((token)=>{
         let content = token.string;
         if (content == "\n"){
-            content = ";<br>";
+            content = ";</div><div>";
         } else if (content == " "){
             content = "&nbsp;";
         }
         return `<span class="${token.constructor.name}${isBrackets(token) ? ' brackets' : ''}${token.string==' ' ? 'space' : ''}">${content}</span>`
     }).join("");
-    return content;
+    return "<div>"+content+"</div>";
 }
 
 function onInputChange(){
