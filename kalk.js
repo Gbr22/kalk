@@ -244,7 +244,7 @@ function execute(tree){
     return tree.getValue();
 }
 
-function evalMath(){
+function evalMath(math){
     let tokens = tokenize(math);
     console.log(tokens);
     let tree = genTree([...tokens]);
