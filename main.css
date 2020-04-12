@@ -94,6 +94,10 @@ body, html {
 }
 #syntax .Identifier {
     color: #E05749;
+    color: #ABB2BF;
+}
+#syntax .Identifier.function {
+    color: #43A3EF;
 }
 #syntax .Number {
     color: #D19A66;

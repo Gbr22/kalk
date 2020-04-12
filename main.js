@@ -36,14 +36,40 @@ function highLight(math){
 
     let isBrackets = (t)=>t.string == "(" || t.string == ")";
 
-    let content = tokens.map((token)=>{
+    for (let i=0; i < tokens.length-1; i++){
+        let token = tokens[i];
+        let next = tokens[i+1];
+        if (token.constructor == next.constructor && token.isType(tokensTypes.Identifier)){
+            token.string+=next.string;
+            tokens.splice(i+1,1);
+            i--;
+        }
+    }
+    
+
+    let content = tokens.map((token,index)=>{
         let content = token.string;
         if (content == "\n"){
             content = ";</div><div>";
         } else if (content == " "){
             content = "&nbsp;";
         }
-        return `<span class="${token.constructor.name}${isBrackets(token) ? ' brackets' : ''}${token.string==' ' ? 'space' : ''}">${content}</span>`
+        function isNext(next){
+            for (let i=index+1; i < tokens.length; i++){
+                let t = tokens[i];
+                if (!t.isType(tokensTypes.WhiteSpace)){
+                    return t.string == next;
+                }
+            }
+            return false;
+        }
+        console.log("function",token,token.isType(tokensTypes.Identifier),isNext("("));
+        return `<span class="
+            ${token.constructor.name}
+            ${isBrackets(token) ? ' brackets' : ''}
+            ${token.string==' ' ? 'space' : ''}
+            ${token.isType(tokensTypes.Identifier) && isNext("(") ? 'function':''}
+        ">${content}</span>`
     }).join("");
     return "<div>"+content+"</div>";
 }
@@ -55,6 +81,7 @@ function onInputChange(){
     try {
         content = highLight(math);
     } catch(err){
+        console.error(err);
         content = math;
     }
     syntax.innerHTML = content;
