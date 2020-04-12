@@ -1,6 +1,9 @@
+//an execute function should always return with a value container object
+//and a value container object should always return with itself
+
 
 class TreeObj {
-    getValue(){}
+    execute(){}
     isValue(){return false}
 }
 
@@ -14,6 +17,7 @@ class Value extends TreeObj {
     isValue(){
         return true;
     };
+    getValue(){}
 }
 class NumberValue extends Value {
     value;
@@ -27,28 +31,15 @@ class NumberValue extends Value {
 }
 class Brackets extends TreeObj {
     contents;
-    getValue(){
+    execute(){
         return execute(this.contents);
-    }
-}
-function valOrEx(side){
-    if (!side){
-        return;
-    } else {
-        let valueContainer;
-        if (!side.isValue()){
-            valueContainer = execute(side);
-        } else {
-            valueContainer = side;
-        }
-        return valueContainer.getValue();
     }
 }
 
 class FactorialOperation extends TreeObj {
     val;
-    getValue(){
-        let value = valOrEx(this.val);
+    execute(){
+        let value = this.val.execute().getValue();
         let fact = factorial(value);
         return new NumberValue(fact);
     }
@@ -61,13 +52,13 @@ class Func extends TreeObj {
     arguments;
     context;
     name;
-    getValue(){ //execute
+    execute(){ //execute
         let args = this.arguments.map(
             (arg)=>{
                 if (arg == undefined){
                     return undefined;
                 } else {
-                    return valOrEx(arg);
+                    return arg.execute().getValue();
                 }
             }
         );
@@ -79,10 +70,10 @@ class Operation extends TreeObj {
     left;
     right;
     operation;
-    getValue(){
+    execute(){
         let tree = this;
-        let left = valOrEx(tree.left);
-        let right = valOrEx(tree.right);
+        let left = tree.left.execute().getValue();
+        let right = tree.right.execute().getValue();
 
         function nthRoot(x, n) {
             if(x < 0 && n%2 != 1) return NaN;
@@ -96,7 +87,7 @@ class Operation extends TreeObj {
             "^":(a,b)=>Math.pow(a,b),
             "ˇ":(a,b)=>nthRoot(a,b),
         }
-        let ev = operations[tree.operation.string](parseFloat(left),parseFloat(right));
+        let ev = operations[tree.operation.string](left,right);
         console.log(left,tree.operation.string,right,"=",ev);
         return new NumberValue(ev);
     }
@@ -124,6 +115,9 @@ let tokensTypes = {
         static is(c){
             return "0123456789.".includes(c);
         }
+        execute(){
+            return this;
+        }
         getValue(){
             return parseFloat(this.string);
         }
@@ -146,8 +140,9 @@ let tokensTypes = {
             }
             return !isOtherType;
         }
+        execute(){return this};
         getValue(){
-            return new NumberValue(this.context[this.string]);
+            return this.context[this.string];
         }
     }
 }
@@ -328,7 +323,7 @@ function genTree(tokens,context){
     return tokens[0];
 }
 function execute(tree){
-    return tree.getValue();
+    return tree.execute();
 }
 
 function evalMath(math,context){

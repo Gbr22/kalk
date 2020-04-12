@@ -1,5 +1,5 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "(0-27)ˇ3";
+let math = "PI * PI / ((8 * 9) + 10) + 5^8 - (0-27)ˇ3";
 
 let input = document.getElementById("input");
 let syntax = document.getElementById("syntax");
