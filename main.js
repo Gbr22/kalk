@@ -1,7 +1,7 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
 let math = 
-`f(x)=random()*x
-f(100)`;
+`f(a,b,c,d,e)=a+b
+f(2,3)`;
 /* let math = `a=5
 a`; */
 

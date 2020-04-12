@@ -14,10 +14,17 @@ class Token extends TreeObj {
     }
 }
 class Value extends TreeObj {
+    value;
     isValue(){
         return true;
     };
-    getValue(){}
+    getValue(){
+        return this.value;
+    }
+    constructor(value){
+        super();
+        this.value = value;
+    }
 }
 class NumberValue extends Value {
     value;
@@ -54,17 +61,31 @@ class Func extends TreeObj {
     name;
     isValue(){return false}
     execute(){ //execute
-        let args = this.arguments.map(
-            (arg)=>{
-                if (arg == undefined){
-                    return undefined;
-                } else {
-                    return arg.execute().getValue();
+        let argsObj = this.arguments;
+        let args = [];
+        if (argsObj){
+            args = argsObj.execute().getValue().map(
+                (arg)=>{
+                    if (arg == undefined){
+                        return undefined;
+                    } else {
+                        return arg.execute().getValue();
+                    }
                 }
-            }
-        );
+            );
+        }
         let out=this.context[this.name.string](...args);
         return new NumberValue(out);
+    }
+}
+function flattenObjList(obj,list=[]){
+    console.log(obj);
+    if (obj.constructor == Operation){
+        list.push(obj.left);
+        return flattenObjList(obj.right,list);
+    } else {
+        list.push(obj);
+        return list;
     }
 }
 class Operation extends TreeObj {
@@ -90,7 +111,10 @@ class Operation extends TreeObj {
         }
         let op = tree.operation.string;
 
-        if (op == "="){
+        if (op == ","){
+            return new Value(flattenObjList(tree));
+        }
+        else if (op == "="){
             
             if (tree.left.isValue()){
                 let val = tree.right.execute().getValue();
@@ -99,8 +123,10 @@ class Operation extends TreeObj {
             } else if(tree.left.constructor == Func){
                 
                 let nameToIndex = {};
-                let args = tree.left.arguments.filter((e)=>e); //TODO: properly handle not haveing undefined arg at index 0 when no args are present
+
+                let args = tree.left.arguments.execute().getValue(); //TODO: properly handle not haveing undefined arg at index 0 when no args are present
                 console.log("args",args);
+                
                 for (let i=0; i < args.length; i++){
                     let arg = args[i];
                     if (arg.constructor != tokensTypes.Identifier){
@@ -151,7 +177,7 @@ let tokensTypes = {
     },
     Symbol:class extends Token {
         static is(c){
-            return "+-*/()!^ˇ\n=".includes(c);
+            return "+-*/()!^ˇ\n=,".includes(c);
         }
     },
     Number:class extends Token {
@@ -312,7 +338,7 @@ function genTree(tokens,context){
             let area = tokens.splice(start,end-start,obj);
             area.shift();
             area.pop();
-            obj.arguments = [genTree(area)];
+            obj.arguments = genTree(area);
             obj.name = tokens[start-1];
             obj.context = context;
             tokens.splice(start-1,1);
@@ -373,6 +399,7 @@ function genTree(tokens,context){
 
     connectTwoSidedOperation("=","=","right");
     connectTwoSidedOperation("\n","\n");
+    connectTwoSidedOperation(",",",","right");
     return tokens[0];
 }
 function execute(tree){
