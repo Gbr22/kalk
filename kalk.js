@@ -31,6 +31,32 @@ class Brackets extends TreeObj {
         return execute(this.contents);
     }
 }
+function valOrEx(side){
+    if (!side){
+        return;
+    } else {
+        let valueContainer;
+        if (!side.isValue()){
+            valueContainer = execute(side);
+        } else {
+            valueContainer = side;
+        }
+        return valueContainer.getValue();
+    }
+}
+
+class FactorialOperation extends TreeObj {
+    val;
+    getValue(){
+        let value = valOrEx(this.val);
+        let fact = factorial(value);
+        return new NumberValue(fact);
+    }
+    constructor(val){
+        super();
+        this.val = val;
+    }
+}
 class Func extends TreeObj {
     arguments;
     context;
@@ -54,19 +80,6 @@ class Operation extends TreeObj {
     right;
     operation;
     getValue(){
-        function valOrEx(side){
-            if (!side){
-                return;
-            } else {
-                let valueContainer;
-                if (!side.isValue()){
-                    valueContainer = execute(side);
-                } else {
-                    valueContainer = side;
-                }
-                return valueContainer.getValue();
-            }
-        }
         let tree = this;
         let left = valOrEx(tree.left);
         let right = valOrEx(tree.right);
@@ -93,7 +106,7 @@ class Operation extends TreeObj {
 let tokensTypes = {
     Symbol:class extends Token {
         static is(c){
-            return "+-*/()".includes(c);
+            return "+-*/()!".includes(c);
         }
     },
     Number:class extends Token {
@@ -254,6 +267,19 @@ function genTree(tokens,context){
         }
         
     }
+    while(notAllConnected("!")){
+        for (let i=0; i< tokens.length; i++){
+            let token = tokens[i];
+        
+            if (token.string == "!"){
+                let obj = new FactorialOperation(tokens[i-1]);
+                tokens.splice(i-1,2,obj);
+
+
+                break;
+            }
+        }
+    }
 
     while(notAllConnected("/") || notAllConnected("*")){
         for (let i=0; i< tokens.length; i++){
@@ -291,10 +317,7 @@ function evalMath(math,context){
 }
 
 
-/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = "factorial(5)";
-/* let math = "5 * 10 + 8 / 5 - 16" */
-/* let math = "0 + sin(1)" */
+
 
 function evalInScope(js, contextAsScope) {
     //# Return the results of the in-line anonymous function we .call with the passed context
@@ -330,7 +353,12 @@ let context = Object.assign(Object.assign({},defaultContext),{
 function test(math,context){
     function benchmark(func){
         console.time();
-        let result = func();
+        let result;
+        try {
+            result = func();
+        } catch(err){
+            result = err;
+        }
         console.timeEnd();
         return result;
     }
@@ -357,4 +385,8 @@ function test(math,context){
 
     console.log("matching",isEqual(myresult,result));
 }
+/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
+let math = "0+(2 + 3)!";
+/* let math = "5 * 10 + 8 / 5 - 16" */
+/* let math = "0 + sin(1)" */
 test(math,context);
