@@ -24,6 +24,9 @@ class Value extends TreeObj {
     getValue(){
         return this.value;
     }
+    execute(){
+        return this;
+    }
     constructor(value){
         super();
         this.value = value;
@@ -97,7 +100,9 @@ class Func extends TreeObj {
                 if (arg == undefined){
                     return undefined;
                 } else {
-                    return arg.execute(c).getValue(c);
+                    
+                    let exec = arg.execute(c);
+                    return exec.getValue(c);
                 }
             }
         );

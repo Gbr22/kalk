@@ -1,9 +1,7 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
 let math = 
-`x=8
-f(x)=pow(2,x)
-f(2)
-x`;
+`f(x)=floor(random()*x)
+f(5)`;
 /* let math = `a=5
 a`; */
 
@@ -94,7 +92,7 @@ function onInputChange(){
 
     } catch(err){
         console.log(err);
-        output.innerHTML = "Error";
+        output.innerHTML = `Error: ${err.message}`;
     }
 
     test(input.value,context);
