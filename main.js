@@ -1,6 +1,7 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
 let math = 
-`f(x)=sin(x)`;
+`f(x)=(x^2)ˇ2
+f(0)`;
 /* let math = `a=5
 a`; */
 
@@ -102,7 +103,8 @@ function onInputChange(){
             canvas.classList.add("visible");
             output.innerHTML = `[Function]`;
         } else if (isNaN(result)){
-            
+            noRender();
+            output.innerHTML = result;
         } else {
             noRender();
             output.innerHTML = result;
