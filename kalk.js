@@ -322,6 +322,20 @@ function isType(something, type){
 let assure = (condition,message)=>{if (!condition){throw new Error(message)}}
 
 function genTree(tokens){
+    {
+        let count = 0;
+        for (let t of tokens){
+            if (t.string == "("){
+                count++;
+            } else if(t.string == ")"){
+                count--;
+            }
+        }
+        if (count != 0){
+            throw new Error("Unpaired brackets");
+        }
+    }
+
     function connect(i){
         tokens[i] = new Operation(tokens[i],tokens[i-1],tokens[i+1]);
         tokens[i-1] = undefined;
