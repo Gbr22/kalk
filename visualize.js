@@ -7,7 +7,6 @@ let resultCache = new Map();
 function setRenderFunction(f){
     resultCache = new Map();
     func = f;
-    console.log("setrenderfunction");
 }
 
 

@@ -186,9 +186,7 @@ class Operation extends TreeObj {
                         }
                     })
                     
-
-
-                    return tree.right.execute(scoped).getValue(c);
+                    return tree.right.execute(scoped).getValue(scoped);
                 };
                 return new Value(c[tree.left.name.string]);
             } else {
