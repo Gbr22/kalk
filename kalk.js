@@ -46,15 +46,15 @@ class NumberValue extends Value {
 }
 class Brackets extends TreeObj {
     contents;
-    execute(){
-        return execute(this.contents);
+    execute(c){
+        return execute(this.contents,c);
     }
 }
 
 class FactorialOperation extends TreeObj {
     val;
-    execute(){
-        let value = this.val.execute().getValue();
+    execute(c){
+        let value = this.val.execute(c).getValue(c);
         let fact = factorial(value);
         return new NumberValue(fact);
     }
@@ -65,14 +65,13 @@ class FactorialOperation extends TreeObj {
 }
 class Func extends TreeObj {
     arguments;
-    context;
     name;
     isValue(){return false}
-    getArguments(){
+    getArguments(context){
         if (!this.arguments){
             return [];
         }
-        let argObj = this.arguments.execute();
+        let argObj = this.arguments.execute(context);
 
         
 
@@ -90,19 +89,20 @@ class Func extends TreeObj {
         
         
     }
-    execute(){ //execute
-        let args = this.getArguments();
+    execute(c){ //execute
+        let args = this.getArguments(c);
         
         args = args.map(
             (arg)=>{
                 if (arg == undefined){
                     return undefined;
                 } else {
-                    return arg.execute().getValue();
+                    return arg.execute(c).getValue(c);
                 }
             }
         );
-        let out=this.context[this.name.string](...args);
+        console.log("context",c);
+        let out=c[this.name.string](...args);
         return new NumberValue(out);
     }
 }
@@ -120,7 +120,7 @@ class Operation extends TreeObj {
     left;
     right;
     operation;
-    execute(){
+    execute(c){
         let tree = this;
         
 
@@ -145,14 +145,14 @@ class Operation extends TreeObj {
         else if (op == "="){
             
             if (tree.left.isValue()){
-                let val = tree.right.execute().getValue();
-                tree.left.execute().setValue(val);
+                let val = tree.right.execute(c).getValue(c);
+                tree.left.execute(c).setValue(c,val);
                 return new NumberValue(val);
             } else if(tree.left.constructor == Func){
                 
                 let nameToIndex = {};
 
-                let args = tree.left.getArguments();
+                let args = tree.left.getArguments(c);
                 
                 for (let i=0; i < args.length; i++){
                     let arg = args[i];
@@ -162,24 +162,26 @@ class Operation extends TreeObj {
                     nameToIndex[arg.string]=i;
                 }
 
-                tree.left.context[tree.left.name.string] = function(){
+                
+                c[tree.left.name.string] = function(){
                     let context = {}
                     for (let p in nameToIndex){
                         context[p] = arguments[nameToIndex[p]];
                     }
                     /* console.log("context",context); */
-                    Object.assign(tree.left.context,context); //TODO: don't pollute the global context
+                    Object.assign(c,context); //TODO: don't pollute the global context
 
 
-                    return tree.right.execute().getValue();
+                    return tree.right.execute(c).getValue(c);
                 };
-                return new NumberValue(undefined);
+                console.log("context set function",c);
+                return new Value(c[tree.left.name.string]);
             } else {
                 throw Error("Cannot set value: Left is not a value container or a function head");
             }
         } else {
-            let left = tree.left.execute().getValue();
-            let right = tree.right.execute().getValue();
+            let left = tree.left.execute(c).getValue(c);
+            let right = tree.right.execute(c).getValue(c);
             let ev = operations[tree.operation.string](left,right);
             return new NumberValue(ev);
         }
@@ -222,7 +224,6 @@ let tokensTypes = {
         static is(){return false}
     },
     Identifier:class extends Token {
-        context;
         string="";
         isValue(){return true};
         static is(c){
@@ -237,17 +238,17 @@ let tokensTypes = {
             return !isOtherType;
         }
         execute(){return this};
-        setValue(value){
-            this.context[this.string] = value;
+        setValue(context,value){
+            context[this.string] = value;
         }
-        getValue(){
-            return this.context[this.string];
+        getValue(context){
+            return context[this.string];
         }
     }
 }
 
 
-function tokenize(str, context, keepWhitespace = false){
+function tokenize(str, context = undefined, keepWhitespace = false){
     let tokens = [];
     let currentToken = null;
     for (let i=0; i < str.length; i++){
@@ -294,11 +295,11 @@ function tokenize(str, context, keepWhitespace = false){
         }
     }).flat();
 
-    for (let token of tokens){
+    /* for (let token of tokens){
         if (token.isType(tokensTypes.Identifier)){
             token.context = context;
         }
-    }
+    } */
 
     /* tokens.push(new tokensTypes.End); */
     return tokens;
@@ -310,7 +311,7 @@ function isType(something, type){
 
 let assure = (condition,message)=>{if (!condition){throw new Error(message)}}
 
-function genTree(tokens,context){
+function genTree(tokens){
     function connect(i){
         tokens[i] = new Operation(tokens[i],tokens[i-1],tokens[i+1]);
         tokens[i-1] = undefined;
@@ -366,7 +367,6 @@ function genTree(tokens,context){
             let args = genTree(area);
             obj.arguments = args;
             obj.name = tokens[start-1];
-            obj.context = context;
             tokens.splice(start-1,1);
         } else {
             let obj = new Brackets();
@@ -428,16 +428,16 @@ function genTree(tokens,context){
     connectTwoSidedOperation(",",",","right");
     return tokens[0];
 }
-function execute(tree){
-    return tree.execute();
+function execute(tree,c){
+    return tree.execute(c);
 }
 
 function evalMath(math,context){
-    let tokens = tokenize(math,context);
+    let tokens = tokenize(math);
     /* console.log("tokens",tokens); */
-    let tree = genTree([...tokens],context);
+    let tree = genTree([...tokens]);
     console.log("tree",tree);
-    return parseFloat(execute(tree).getValue());
+    return parseFloat(execute(tree,context).getValue());
 }
 
 
