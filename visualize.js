@@ -17,7 +17,7 @@ function resiz(){
         canvas.classList.add("loaded");
     }
     canvas.width = window.innerWidth;
-    canvas.height = canvas.computedStyleMap().get("height").value;
+    canvas.height = canvas.clientHeight;
 }
 onload = function(){
     resiz();
@@ -25,7 +25,7 @@ onload = function(){
 onresize = resiz;
 
 let view = {
-    scale:8,
+    scale:20,
     x:0,
     y:0
 }
