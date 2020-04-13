@@ -71,7 +71,7 @@ class Func extends TreeObj {
     name;
     isValue(){return false}
     getArguments(context){
-        if (!this.arguments){
+        if (this.arguments == undefined){
             return [];
         }
         let argObj = this.arguments.execute(context);
@@ -106,6 +106,7 @@ class Func extends TreeObj {
                 }
             }
         );
+        
         let out=c[this.name.string](...args);
         return new NumberValue(out);
     }
@@ -172,13 +173,19 @@ class Operation extends TreeObj {
                     for (let p in nameToIndex){
                         context[p] = arguments[nameToIndex[p]];
                     }
+                    
                     /* console.log("context",context); */
                     let scoped = new Proxy(context,{
                         get(_,prop){
-                            return context[prop] || c[prop];
+                            if (context.hasOwnProperty(prop)){
+                                return context[prop];
+                            } else {
+                                return c[prop];
+                            }
+                             
                         },
                         set(_,prop,value){
-                            if (context[prop]){
+                            if (context.hasOwnProperty(prop)){
                                 return context[prop] = value;
                             } else {
                                 return c[prop] = value;
@@ -186,7 +193,11 @@ class Operation extends TreeObj {
                         }
                     })
                     
-                    return tree.right.execute(scoped).getValue(scoped);
+                    
+
+                    let functionResult = tree.right.execute(scoped)
+                    
+                    return functionResult.getValue(scoped);
                 };
                 return new Value(c[tree.left.name.string]);
             } else {
@@ -491,6 +502,7 @@ let defaultContext = {
     "τ":Math.PI/2,
     factorial,
 }
+evalMath("abs(x)=(x^2)ˇ2",defaultContext);
 for (let p of Object.getOwnPropertyNames(Math)){
     if (!defaultContext[p]){
         defaultContext[p] = Math[p];
