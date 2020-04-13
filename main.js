@@ -95,6 +95,12 @@ function onInputChange(){
         canvas.classList.remove("visible");
     }
 
+    if (math == ""){
+        noRender();
+        output.innerHTML = "";
+        return;
+    }
+
     try {
         let result = evalMath(math,Object.assign({},defaultContext));
         console.log("res",result);
