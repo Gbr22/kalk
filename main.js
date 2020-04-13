@@ -71,9 +71,14 @@ function highLight(math){
     }).join("");
     return "<div>"+content+"</div>";
 }
-
+let lastMath = null;
 function onInputChange(){
     let math = input.value;
+    if (math == lastMath){
+        return;
+    } else {
+        lastMath = math;
+    }
     
     let content;
     try {
@@ -84,21 +89,28 @@ function onInputChange(){
     }
     syntax.innerHTML = content;
 
+    function noRender(){
+        setRenderFunction(undefined);
+        canvas.classList.remove("visible");
+    }
+
     try {
         let result = evalMath(math,Object.assign({},defaultContext));
         console.log("res",result);
         if (typeof result == "function"){
-            func = result;
+            setRenderFunction(result);
             canvas.classList.add("visible");
             output.innerHTML = `[Function]`;
+        } else if (isNaN(result)){
+            
         } else {
-            func = undefined;
-            canvas.classList.remove("visible");
+            noRender();
             output.innerHTML = result;
         }
         
 
     } catch(err){
+        noRender();
         console.log(err);
         output.innerHTML = `Error: ${err.message}`;
     }

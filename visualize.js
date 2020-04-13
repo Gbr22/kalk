@@ -3,6 +3,12 @@ let ctx = canvas.getContext("2d");
 
 let func = undefined;
 /* func = Math.sin */
+let resultCache = new Map();
+function setRenderFunction(f){
+    resultCache = new Map();
+    func = f;
+    console.log("setrenderfunction");
+}
 
 
 function inputFunc(event){
@@ -36,6 +42,20 @@ function updateInfoBox(){
 }
 updateInfoBox();
 function draw(){
+    let countCache = 0;
+    let countCalc = 0;
+    function getResult(x){
+        
+        if (!resultCache.get(x)){
+            resultCache.set(x,func(x));
+            countCalc++;
+        } else {
+            countCache++;
+        }
+        
+        return resultCache.get(x);
+    }
+
     if (!func){
         return requestAnimationFrame(draw);
     }
@@ -102,7 +122,7 @@ function draw(){
 
         let y;
         try {
-            y = func(x);
+            y = getResult(x);
         } catch(err){
             prevDot = null;
         }
@@ -115,7 +135,7 @@ function draw(){
 
         prevDot = current;
     }
-
+    /* console.log(countCache, countCalc); */
     requestAnimationFrame(draw);
 }
 draw();
