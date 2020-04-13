@@ -179,3 +179,16 @@ onmousemove = (event)=>{
 onmouseup = (event)=>{
     drag.dragging = false;
 }
+{
+    var mc = new Hammer.Manager(canvas);
+    var pinch = new Hammer.Pinch();
+    mc.add([pinch]);
+
+    mc.on("pinchmove", function(ev) {
+        let plusScale = ev.scale-1;
+        plusScale/=15;
+        view.scale *= (1+plusScale);
+        updateInfoBox();
+        console.log(view.scale,ev.scale,ev);
+    });
+}
