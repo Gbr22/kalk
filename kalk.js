@@ -207,11 +207,18 @@ class Operation extends TreeObj {
             let left = tree.left.execute(c).getValue(c);
             let right = tree.right.execute(c).getValue(c);
 
-            if (left.constructor == Vector){
-                return new Value(left.doOp(tree.operation,right));
-            } else if (right.constructor == Vector){
-                return new Value(right.doOp(tree.operation,left));
+            if (tree.operation.string != "\n"){
+                if (left.constructor == Vector){
+                    return new Value(left.doOp(tree.operation,right));
+                } else if (right.constructor == Vector){
+                    return new Value(right.doOp(tree.operation,left));
+                }
+    
+                if ((typeof left != "number" || typeof right != "number")){
+                    throw Error("Only numbers and vectors allowed in operation");
+                }
             }
+            
 
             let ev = operations[tree.operation.string](left,right);
             return new NumberValue(ev);
