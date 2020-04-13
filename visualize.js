@@ -5,8 +5,10 @@ let func = undefined;
 /* func = Math.sin */
 let resultCache = new Map();
 function setRenderFunction(f){
+    console.log("setRenderFunction",f);
     resultCache = new Map();
     func = f;
+    resiz();
 }
 
 
@@ -56,7 +58,8 @@ function draw(){
     }
 
     if (!func){
-        return requestAnimationFrame(draw);
+        requestAnimationFrame(draw);
+        return;
     }
     ctx.fillStyle = "#1E2223";
     let width = canvas.width;

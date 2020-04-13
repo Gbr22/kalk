@@ -1,7 +1,7 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
 let math = 
 `f(x)=(x^2)ˇ2
-f(0)`;
+f(2)`;
 /* let math = `a=5
 a`; */
 
@@ -91,6 +91,7 @@ function onInputChange(){
     syntax.innerHTML = content;
 
     function noRender(){
+        
         setRenderFunction(undefined);
         canvas.classList.remove("visible");
     }
@@ -99,8 +100,9 @@ function onInputChange(){
         let result = evalMath(math,Object.assign({},defaultContext));
         console.log("res",result);
         if (typeof result == "function"){
-            setRenderFunction(result);
             canvas.classList.add("visible");
+            setRenderFunction(result);
+            
             output.innerHTML = `[Function]`;
         } else if (isNaN(result)){
             noRender();
