@@ -206,6 +206,13 @@ class Operation extends TreeObj {
         } else {
             let left = tree.left.execute(c).getValue(c);
             let right = tree.right.execute(c).getValue(c);
+
+            if (left.constructor == Vector){
+                return new Value(left.doOp(tree.operation,right));
+            } else if (right.constructor == Vector){
+                return new Value(right.doOp(tree.operation,left));
+            }
+
             let ev = operations[tree.operation.string](left,right);
             return new NumberValue(ev);
         }
@@ -494,6 +501,57 @@ function factorial(n){
     return result;
 }
 
+class Vector {
+    values=[];
+    doOp(operation,other){
+        let ops = {
+            "+":()=>{
+                assure(other.constructor == Vector,"Addition only allowed with another Vector");
+                let result = new Vector(...this.values);
+                for (let i=0; i<  this.values.length; i++){
+                    result.values[i]+=other.values[i];
+                }
+
+                return result;
+            },
+            "-":()=>{
+                assure(other.constructor == Vector,"Substraction only allowed with another Vector");
+                let result = new Vector(...this.values);
+                for (let i=0; i<  this.values.length; i++){
+                    result.values[i]-=other.values[i];
+                }
+
+                return result;
+            },
+            "*":()=>{
+                assure(other.constructor == Number);
+                let result = new Vector(...this.values);
+                for (let i=0; i<  this.values.length; i++){
+                    result.values[i]*=other;
+                }
+
+                return result;
+            }
+        }
+        let func = ops[operation.string];
+        if (!func){
+            throw Error("Invalid operation on vector");
+        } else {
+            return func();
+        }
+    }
+    getLength(){
+        let a = this.values[0];
+        let b = this.values[1];
+        return Math.sqrt(a*a+b*b);
+    }
+    constructor(){
+        if (arguments.length > 2 || arguments.length < 2){
+            throw Error("Invalid Vector dimension");
+        }
+        this.values = [...arguments];
+    }
+}
 
 let defaultContext = {
     "PI":Math.PI,
@@ -501,6 +559,10 @@ let defaultContext = {
     "Tau":Math.PI/2,
     "τ":Math.PI/2,
     factorial,
+    v:function(){
+        let vector = new Vector(...arguments);
+        return vector;
+    }
 }
 evalMath("abs(x)=(x^2)ˇ2",defaultContext);
 for (let p of Object.getOwnPropertyNames(Math)){
