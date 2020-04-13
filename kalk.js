@@ -101,7 +101,6 @@ class Func extends TreeObj {
                 }
             }
         );
-        console.log("context",c);
         let out=c[this.name.string](...args);
         return new NumberValue(out);
     }
@@ -169,12 +168,23 @@ class Operation extends TreeObj {
                         context[p] = arguments[nameToIndex[p]];
                     }
                     /* console.log("context",context); */
-                    Object.assign(c,context); //TODO: don't pollute the global context
+                    let scoped = new Proxy(context,{
+                        get(_,prop){
+                            return context[prop] || c[prop];
+                        },
+                        set(_,prop,value){
+                            if (context[prop]){
+                                return context[prop] = value;
+                            } else {
+                                return c[prop] = value;
+                            }
+                        }
+                    })
+                    
 
 
-                    return tree.right.execute(c).getValue(c);
+                    return tree.right.execute(scoped).getValue(c);
                 };
-                console.log("context set function",c);
                 return new Value(c[tree.left.name.string]);
             } else {
                 throw Error("Cannot set value: Left is not a value container or a function head");
