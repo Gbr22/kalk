@@ -161,34 +161,58 @@ let drag = {
     vStartX:0,
     vStartY:0
 }
-canvas.onmousedown = (event)=>{
+/* canvas.onmousedown = (event)=>{
+    dragStart(event);
+};
+onmousemove = (event)=>{
+    dragMove(event);
+} */
+function dragStart(event){
     drag.dragging = true;
     drag.startX = event.clientX;
     drag.startY = event.clientY;
     drag.vStartX = view.x;
     drag.vStartY = view.y;
-    
-};
-onmousemove = (event)=>{
+}
+function dragMove(event){
     if (drag.dragging){
         view.x = drag.vStartX + drag.startX-event.clientX;
         view.y = drag.vStartY + drag.startY-event.clientY;
-        
     }
 }
-onmouseup = (event)=>{
+function dragEnd(){
     drag.dragging = false;
 }
+
+/* onmouseup = (event)=>{
+    dragEnd();
+} */
 {
     var mc = new Hammer.Manager(canvas);
     var pinch = new Hammer.Pinch();
-    mc.add([pinch]);
+    var pan = new Hammer.Pan();
+    mc.add([pinch, pan]);
 
+    mc.on("panstart",function(ev){
+        dragStart(ev.srcEvent);
+    })
+    mc.on("panend",function(ev){
+        dragEnd();
+    })
+    mc.on("panmove",function(ev){
+        let event = ev.srcEvent;
+        dragMove(event);
+        
+
+        /* view.x -= ev.overallVelocityX/speed;
+        view.y -= ev.overallVelocityY/speed; */
+        
+    });
     mc.on("pinchmove", function(ev) {
         let plusScale = ev.scale-1;
         plusScale/=15;
         view.scale *= (1+plusScale);
         updateInfoBox();
-        console.log(view.scale,ev.scale,ev);
+        /* console.log(view.scale,ev.scale,ev); */
     });
 }
