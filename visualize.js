@@ -143,14 +143,20 @@ canvas.addEventListener('wheel', function(e) {
     let speed = 0.1;
     let d = -e.deltaY;
     
+    let change;
     if (d > 0){
-        view.scale *= 1+speed;
-        view.x *= 1+speed;
+        change = 1+speed;
+        
     } else {
-        view.scale *= 1-speed;
-        view.x *= 1-speed;
+        change = 1-speed;
     }
-    
+    view.scale *= change;
+    view.x *= change;
+    view.y *= change;
+    drag.vStartX = view.x;
+    drag.vStartY = view.y;
+    drag.startX = mouse.x;
+    drag.startY = mouse.y;
     
     updateInfoBox();
 });
@@ -161,12 +167,18 @@ let drag = {
     vStartX:0,
     vStartY:0
 }
+let mouse = {
+    x:0,
+    y:0
+}
 /* canvas.onmousedown = (event)=>{
     dragStart(event);
-};
+}; */
 onmousemove = (event)=>{
-    dragMove(event);
-} */
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+    /* dragMove(event); */
+}
 function dragStart(event){
     drag.dragging = true;
     drag.startX = event.clientX;
