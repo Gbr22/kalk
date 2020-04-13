@@ -466,7 +466,7 @@ function evalMath(math,context){
     /* console.log("tokens",tokens); */
     let tree = genTree([...tokens]);
     console.log("tree",tree);
-    return parseFloat(execute(tree,context).getValue());
+    return (execute(tree,context).getValue());
 }
 
 

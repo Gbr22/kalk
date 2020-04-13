@@ -1,7 +1,6 @@
 /* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
 let math = 
-`f(x)=floor(random()*x)
-f(5)`;
+`f(x)=sin(x)`;
 /* let math = `a=5
 a`; */
 
@@ -88,7 +87,16 @@ function onInputChange(){
     try {
         let result = evalMath(math,Object.assign({},defaultContext));
         console.log("res",result);
-        output.innerHTML = result;
+        if (typeof result == "function"){
+            func = result;
+            canvas.classList.add("visible");
+            output.innerHTML = `[Function]`;
+        } else {
+            func = undefined;
+            canvas.classList.remove("visible");
+            output.innerHTML = result;
+        }
+        
 
     } catch(err){
         console.log(err);
