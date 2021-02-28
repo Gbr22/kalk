@@ -1,8 +1,4 @@
-/* let math = "7.56 * 28 / 3 + 6.5 * 56 / 456 - 446 + 654"; */
-let math = 
-`v(1,1)-v(1,3)*2`;
-/* let math = `a=5
-a`; */
+let math = "";
 
 let input = document.getElementById("input");
 let syntax = document.getElementById("syntax");
